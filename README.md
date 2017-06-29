@@ -5,6 +5,10 @@ The code also works with the [Teensy (3.1)](https://www.pjrc.com/teensy/)
 
 Modified by Jack Zimmermann for supporting hardware SPI using the predefined MOSI and SCK pins on supported devices.
 
+Further improved performance by Vincent Fischer avoiding slow Arduino functions and added every standard ASCII symbol that can be expressed in 7 (or 8) segments.
+
+
+
 This is a modified version using hardware SPI calls instead of bit banging. Speed increase is 20x or greater.
 
 Usage
@@ -22,17 +26,11 @@ Pin Assignments
 | Leonardo | ICSP-4 | ICSP-1 | ICSP-3 | - | - |
 | Due | ICSP-4 | ICSP-1 | ICSP-3 | - | 4, 10, 52 |
 | Deek-Robot Arduino | 11 | 12 | 13 | - | 10 |	
-
+| Pro / Pro Mini     | 11  | 12  | 13 | - | 14
 
 Documentation
 -------------
 Documentation for the library is on the [Github Project Pages](http://wayoda.github.io/LedControl/)
-
-Download
---------
-The lastest binary version of the Library is always available from the 
-[LedControl Release Page](https://github.com/wayoda/LedControl/releases) 
-
 
 Install
 -------
