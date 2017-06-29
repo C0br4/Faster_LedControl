@@ -35,7 +35,7 @@
 #include <WProgram.h>
 #endif
 
-#include 'CharTable.h'
+#include "CharTable.h"
 
 
 class LedControl {
