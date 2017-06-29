@@ -13,7 +13,7 @@ This is a modified version using hardware SPI calls instead of bit banging. Spee
 
 Usage
 -----
-You need to use the assigned hardware SPI pins on your Arduino. Se table for correct pins. Some Arduinos doesn't have the SCK pin so this library won't work on those. The Chip Select(csPin) can be any pin you like, except one of the aforementioned pins. The new initialisation only needs the csPin and number of devices.
+You need to use the assigned hardware SPI pins on your Arduino. See table for correct pins. Some Arduinos doesn't have the SCK pin so this library won't work on those. The Chip Select(csPin) can be any pin you like, except one of the aforementioned pins. The new initialisation only needs the csPin and number of devices.
 **LedControl::LedControl(int csPin, int numDevices)**
 
 Pin Assignments
@@ -30,7 +30,7 @@ Pin Assignments
 
 Documentation
 -------------
-Documentation for the library is on the [Github Project Pages](http://wayoda.github.io/LedControl/)
+Documentation for the (original) library is on the [Github Project Pages](http://wayoda.github.io/LedControl/)
 
 Install
 -------
