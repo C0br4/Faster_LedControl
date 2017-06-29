@@ -28,6 +28,19 @@
 #include "LedControl.h"
 #include <SPI.h>
 
+//faster digital read/write
+#define portOfPin(P)\
+  (((P)>=0&&(P)<8)?&PORTD:(((P)>7&&(P)<14)?&PORTB:&PORTC))
+#define ddrOfPin(P)\
+  (((P)>=0&&(P)<8)?&DDRD:(((P)>7&&(P)<14)?&DDRB:&DDRC))
+#define pinIndex(P)((uint8_t)(P>13?P-14:P&7))
+#define pinMask(P)((uint8_t)(1<<pinIndex(P)))
+
+#define pinAsOutput(P) *(ddrOfPin(P))|=pinMask(P)
+#define digitalLow(P) *(portOfPin(P))&=~pinMask(P)
+#define digitalHigh(P) *(portOfPin(P))|=pinMask(P)
+
+
 //the opcodes for the MAX7221 and MAX7219
 #define OP_NOOP   0
 #define OP_DIGIT0 1
@@ -50,13 +63,17 @@ LedControl::LedControl(int csPin, int numDevices) {
     if(numDevices<=0 || numDevices>8 )
         numDevices=8;
     maxDevices=numDevices;
-    pinMode(MOSI,OUTPUT);
-    pinMode(SCK,OUTPUT);
-    pinMode(SPI_CS,OUTPUT);
-		SPI.setBitOrder(MSBFIRST);
-		SPI.setDataMode(SPI_MODE0);
-		SPI.begin();
-    digitalWrite(SPI_CS,HIGH);
+
+    pinAsOutput(MOSI);
+    pinAsOutput(SCK);
+    pinAsOutput(SPI_CS);
+    
+	SPI.setBitOrder(MSBFIRST);
+	SPI.setDataMode(SPI_MODE0);
+	SPI.begin();
+
+    digitalHigh(SPI_CS);
+
     for(int i=0;i<64;i++) 
         status[i]=0x00;
     for(int i=0;i<maxDevices;i++) {
@@ -202,15 +219,15 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
     spidata[offset+1]=opcode;
     spidata[offset]=data;
     //enable the line 
-    digitalWrite(SPI_CS,LOW);
+    digitalLow(SPI_CS);
     //Now shift out the data
-		SPI.beginTransaction(SPISettings(100000000, MSBFIRST, SPI_MODE0));
+	SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE0));
     for(int i=maxbytes;i>0;i--)
 			SPI.transfer(spidata[i-1]);
-//       shiftOut(MOSI,SCK,MSBFIRST,spidata[i-1]);
+//  shiftOut(MOSI,SCK,MSBFIRST,spidata[i-1]);
     //latch the data onto the display
-		SPI.endTransaction();
-    digitalWrite(SPI_CS,HIGH);
+	SPI.endTransaction();
+    digitalHigh(SPI_CS);
 }    
 
 
