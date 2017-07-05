@@ -57,8 +57,9 @@
 #define OP_SHUTDOWN    12
 #define OP_DISPLAYTEST 15
 
-
 LedControl::LedControl(int csPin, int numDevices) {
+    legacy = false;
+
     SPI_CS=csPin;
     if(numDevices<=0 || numDevices>8 )
         numDevices=8;
@@ -74,6 +75,36 @@ LedControl::LedControl(int csPin, int numDevices) {
 
     digitalHigh(SPI_CS);
 
+    for(int i=0;i<64;i++) 
+        status[i]=0x00;
+    for(int i=0;i<maxDevices;i++) {
+        spiTransfer(i,OP_DISPLAYTEST,0);
+        //scanlimit is set to max on startup
+        setScanLimit(i,7);
+        //decode is done in source
+        spiTransfer(i,OP_DECODEMODE,0);
+        clearDisplay(i);
+        //we go into shutdown-mode on startup
+        shutdown(i,true);
+    }
+}
+
+LedControl::LedControl(int dataPin, int clkPin, int csPin, int numDevices) {
+    legacy = true;
+
+    SPI_MOSI=dataPin;
+    SPI_CLK=clkPin;
+    SPI_CS=csPin;
+    if(numDevices<=0 || numDevices>8 )
+        numDevices=8;
+    maxDevices=numDevices;
+
+    pinMode(SPI_MOSI,OUTPUT);
+    pinMode(SPI_CLK,OUTPUT);
+    pinMode(SPI_CS,OUTPUT);
+
+    digitalWrite(SPI_CS,HIGH);
+    SPI_MOSI=dataPin;
     for(int i=0;i<64;i++) 
         status[i]=0x00;
     for(int i=0;i<maxDevices;i++) {
@@ -221,12 +252,20 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
     //enable the line 
     digitalLow(SPI_CS);
     //Now shift out the data
-	SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE0));
-    for(int i=maxbytes;i>0;i--)
-			SPI.transfer(spidata[i-1]);
-//  shiftOut(MOSI,SCK,MSBFIRST,spidata[i-1]);
+    if(legacy) {
+        for(int i = maxbytes; i > 0; i--)
+            shiftOut(MOSI,SCK,MSBFIRST,spidata[i-1]);
+    }
+    else {
+
+        SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE0));
+        
+        for(int i = maxbytes; i > 0; i--)
+            SPI.transfer(spidata[i-1]);
+
+        SPI.endTransaction();
+    }
     //latch the data onto the display
-	SPI.endTransaction();
     digitalHigh(SPI_CS);
 }    
 
