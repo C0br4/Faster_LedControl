@@ -5,7 +5,7 @@ The code also works with the [Teensy (3.1)](https://www.pjrc.com/teensy/)
 
 Modified by Jack Zimmermann for supporting hardware SPI using the predefined MOSI and SCK pins on supported devices.
 
-Further improved performance by Vincent Fischer avoiding slow Arduino functions and added every standard ASCII symbol that can be expressed in 7 (or 8) segments.
+Further improved performance by Vincent Fischer avoiding slow Arduino functions by using direct port manipulation. Additionally, every standard ASCII symbol that can be expressed in 7 (or 8) segments can be used now.
 
 
 
