@@ -28,6 +28,7 @@
 #include "LedControl.h"
 #include <SPI.h>
 
+#if ARDUINO_ARCH_AVR
 //faster digital read/write
 #define portOfPin(P)\
   (((P)>=0&&(P)<8)?&PORTD:(((P)>7&&(P)<14)?&PORTB:&PORTC))
@@ -39,6 +40,11 @@
 #define pinAsOutput(P) *(ddrOfPin(P))|=pinMask(P)
 #define digitalLow(P) *(portOfPin(P))&=~pinMask(P)
 #define digitalHigh(P) *(portOfPin(P))|=pinMask(P)
+#else
+#define pinAsOutput(P) pinMode(P, OUTPUT)
+#define digitalLow(P) digitalWrite(P, LOW)
+#define digitalHigh(P) digitalWrite(P, HIGH)
+#endif
 
 
 //the opcodes for the MAX7221 and MAX7219
